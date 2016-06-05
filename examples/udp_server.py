@@ -7,13 +7,14 @@ You can use udp_client.py to send a message.
 """
 from __future__ import print_function
 from gevent.server import DatagramServer
-
+import random 
 
 class EchoServer(DatagramServer):
 
     def handle(self, data, address): # pylint:disable=method-hidden
         print('%s: got %r' % (address[0], data))
-        self.socket.sendto(('Received %s bytes' % len(data)).encode('utf-8'), address)
+        if random.randint(1,17)%2 == 0:
+        	self.socket.sendto(data.encode('utf-8'), address)
 
 
 if __name__ == '__main__':
