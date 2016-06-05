@@ -10,12 +10,21 @@ There's nothing gevent-specific here.
 from __future__ import print_function
 import sys
 from gevent import socket
+from gevent import Timeout
+
 
 address = ('localhost', 9000)
 message = ' '.join(sys.argv[1:])
 sock = socket.socket(type=socket.SOCK_DGRAM)
 sock.connect(address)
 print('Sending %s bytes to %s:%s' % ((len(message), ) + address))
-sock.send(message.encode())
-data, address = sock.recvfrom(8192)
-print('%s:%s: got %r' % (address + (data, )))
+for i in xrange(1,20):
+	try:
+		timer = Timeout(3).start()
+		msg = message + str(i)
+		sock.send(msg.encode(),timeout=timer)
+		data, address = sock.recvfrom(8192)
+		print('%s:%s: got %r' % (address + (data, )))
+	except Timeout:
+		print('send 1 timed out')
+		continue
